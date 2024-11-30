@@ -15,24 +15,17 @@ public class DadosService : IDadosService
 {
     private readonly DbContextClass _dbContext;
 
-    /// <summary>
-    /// Construtor do serviço de dados.
-    /// </summary>
-    /// <param name="dbContext">Contexto do banco de dados.</param>
     public DadosService(DbContextClass dbContext)
     {
         _dbContext = dbContext;
     }
 
     /// <summary>
-    /// Obtém as pontuações de qualidade de vida de um bairro com base no nome fornecido.
+    /// Obtém as pontuações de qualidade de vida de um bairro com base no CEP.
     /// </summary>
-    /// <param name="nomeBairro">Nome do bairro fornecido pela API.</param>
-    /// <returns>Um objeto <see cref="RetornoPontuacoesPorBairro"/> contendo as pontuações calculadas.</returns>
-    /// <exception cref="ArgumentException">Lançado se nenhum bairro correspondente for encontrado.</exception>
     public async Task<RetornoPontuacoesPorBairro> ObterPontuacoesPorCep(int cep)
     {
-        string urlCep = "https://viacep.com.br/ws/" + cep + "/json/";
+        string urlCep = $"https://viacep.com.br/ws/{cep}/json/";
         var httpClient = new HttpClient();
         var response = await httpClient.GetAsync(urlCep);
 
@@ -42,171 +35,167 @@ public class DadosService : IDadosService
         }
 
         var dadosCep = await response.Content.ReadAsStringAsync();
-
         if (string.IsNullOrEmpty(dadosCep))
         {
             throw new HttpRequestException("A resposta da API de CEP está vazia.");
         }
 
         var dadosCepDeserializado = JsonConvert.DeserializeObject<RetornoApiCep>(dadosCep);
-        // Nome do bairro fornecido pela API
         var nomeBairroApi = dadosCepDeserializado.Bairro;
 
-        // Tenta obter um bairro com nome semelhante ao fornecido
         var bairro = await ObterBairroComNomeParecido(nomeBairroApi);
-
-        // Verifica se o bairro foi encontrado
         if (bairro == null)
         {
-            throw new ArgumentException($"Nao foi encontrado um bairro com o nome {nomeBairroApi}");
+            throw new ArgumentException($"Não foi encontrado um bairro com o nome {nomeBairroApi}");
         }
 
-        // Pesos dos indicadores
+        // Pesos ajustados para indicadores
         const double pesoAreaVerde = 0.30;
-        const double pesoPoluicaoSonora = 0.25;
-        const double pesoEstruturaDeServicos = 0.30;
-        const double pesoDensidadePopulacional = 0.15;
+        const double pesoEducacao = 0.25;
+        const double pesoSaude = 0.25;
+        const double pesoDensidadePopulacional = 0.20;
 
-        // Calcula as pontuações individuais
         var pontuacaoAreaVerde = CalcularPontuacaoAreaVerde(bairro);
+        var pontuacaoEducacao = CalcularPontuacaoEducacao(bairro);
+        var pontuacaoSaude = CalcularPontuacaoSaude(bairro);
         var pontuacaoDensidadePopulacional = CalcularPontuacaoDensidadePopulacional(bairro);
-        var pontuacaoEstruturaDeServicos = CalcularPontuacaoEstruturaDeServicos(bairro);
-        var pontuacaoPoluicaoSonora = CalcularPontuacaoPoluicaoSonora(bairro);
 
-        // Calcula a pontuação total com base nos pesos
         var pontuacaoTotal =
             (pontuacaoAreaVerde * pesoAreaVerde) +
-            (pontuacaoPoluicaoSonora * pesoPoluicaoSonora) +
-            (pontuacaoEstruturaDeServicos * pesoEstruturaDeServicos) +
+            (pontuacaoEducacao * pesoEducacao) +
+            (pontuacaoSaude * pesoSaude) +
             (pontuacaoDensidadePopulacional * pesoDensidadePopulacional);
 
-        // Cria o objeto de retorno com as pontuações calculadas
-        var pontuacoesFinais = new RetornoPontuacoesPorBairro()
+        return new RetornoPontuacoesPorBairro
         {
             NomeBairro = bairro.Nome,
             Latitude = bairro.Latitude,
             Longitude = bairro.Longitude,
             PontuacaoAreaVerde = pontuacaoAreaVerde,
+            PontuacaoEducacao = pontuacaoEducacao,
+            PontuacaoSaude = pontuacaoSaude,
             PontuacaoDensidadePopulacional = pontuacaoDensidadePopulacional,
-            PontuacaoEstruturaDeServicos = pontuacaoEstruturaDeServicos,
-            PontuacaoPoluicaoSonora = pontuacaoPoluicaoSonora,
             PontuacaoTotal = pontuacaoTotal
         };
-
-        return pontuacoesFinais;
     }
 
-    /// <summary>
-    /// Calcula a pontuação relacionada à poluição sonora para um bairro.
-    /// </summary>
-    /// <param name="bairroComPontuacoesBrutas">Objeto do bairro contendo as pontuações brutas.</param>
-    /// <returns>Pontuação de 0 a 100, onde 100 representa ausência de poluição sonora.</returns>
-    private double CalcularPontuacaoPoluicaoSonora(Bairro bairroComPontuacoesBrutas)
+    public async Task<RetornoMediaPontuacoesGerais> ObterMediaPontuacoesGerais()
     {
-        // Verifica se há registro de poluição sonora
-        if (bairroComPontuacoesBrutas.Pontuacoes.PoluicaoSonoraEArTransito == 0)
+        var bairros = await _dbContext.Bairros.Include(b => b.Pontuacoes).ToListAsync();
+
+        if (bairros == null || bairros.Count == 0)
         {
-            return 100; // Sem poluição sonora, pontuação máxima
+            throw new InvalidOperationException("Não há bairros registrados para calcular as pontuações gerais.");
         }
 
-        // Define o valor máximo aceitável de poluição sonora proporcional à área do bairro
-        var maxPoluicaoAceitavel = 5 * bairroComPontuacoesBrutas.AreaEmKm2;
+        double totalPontuacaoAreaVerde = 0;
+        double totalPontuacaoEducacao = 0;
+        double totalPontuacaoSaude = 0;
+        double totalPontuacaoDensidadePopulacional = 0;
+        int totalBairros = bairros.Count;
 
-        // Calcula a proporção em relação ao valor ideal
-        var proporcaoPoluicao = bairroComPontuacoesBrutas.Pontuacoes.PoluicaoSonoraEArTransito / maxPoluicaoAceitavel;
-
-        // Calcula a pontuação invertida (quanto menos poluição, maior a pontuação)
-        var pontuacao = Math.Max(0, (1 - proporcaoPoluicao) * 100);
-
-        return pontuacao;
-    }
-
-    /// <summary>
-    /// Calcula a pontuação relacionada à densidade populacional para um bairro.
-    /// </summary>
-    private double CalcularPontuacaoDensidadePopulacional(Bairro bairroComPontuacoesBrutas)
-    {
-        if (bairroComPontuacoesBrutas.Pontuacoes.DensidadePopulacional == 0)
+        foreach (var bairro in bairros)
         {
-            return 0; // Sem densidade registrada
+            totalPontuacaoAreaVerde += CalcularPontuacaoAreaVerde(bairro);
+            totalPontuacaoEducacao += CalcularPontuacaoEducacao(bairro);
+            totalPontuacaoSaude += CalcularPontuacaoSaude(bairro);
+            totalPontuacaoDensidadePopulacional += CalcularPontuacaoDensidadePopulacional(bairro);
         }
 
-        var ideal = 15000 * bairroComPontuacoesBrutas.AreaEmKm2;
+        var mediaPontuacaoAreaVerde = totalPontuacaoAreaVerde / totalBairros;
+        var mediaPontuacaoEducacao = totalPontuacaoEducacao / totalBairros;
+        var mediaPontuacaoSaude = totalPontuacaoSaude / totalBairros;
+        var mediaPontuacaoDensidadePopulacional = totalPontuacaoDensidadePopulacional / totalBairros;
 
-        // Calcula a pontuação proporcional à densidade ideal
-        var pontuacao = (bairroComPontuacoesBrutas.Pontuacoes.DensidadePopulacional / ideal) * 100;
+        var mediaPontuacaoTotal = (mediaPontuacaoAreaVerde * 0.30) +
+                                  (mediaPontuacaoEducacao * 0.25) +
+                                  (mediaPontuacaoSaude * 0.25) +
+                                  (mediaPontuacaoDensidadePopulacional * 0.20);
 
-        return pontuacao;
+        return new RetornoMediaPontuacoesGerais
+        {
+            MediaPontuacaoAreaVerde = mediaPontuacaoAreaVerde,
+            MediaPontuacaoEducacao = mediaPontuacaoEducacao,
+            MediaPontuacaoSaude = mediaPontuacaoSaude,
+            MediaPontuacaoDensidadePopulacional = mediaPontuacaoDensidadePopulacional,
+            MediaPontuacaoTotal = mediaPontuacaoTotal
+        };
     }
 
-    /// <summary>
-    /// Calcula a pontuação relacionada à área verde para um bairro.
-    /// </summary>
-    private double CalcularPontuacaoAreaVerde(Bairro bairroComPontuacoesBrutas)
+    private double CalcularPontuacaoSaude(Bairro bairro)
     {
-        if (bairroComPontuacoesBrutas.Pontuacoes.AreaVerde == 0)
+        if (bairro.Pontuacoes.Saude == 0)
+        {
+            return 0; // Sem serviços de saúde registrados
+        }
+
+        var populacao = bairro.Pontuacoes.DensidadePopulacional * bairro.AreaEmKm2;
+        var unidadesSaudeIdeais = populacao / 3000; // 1 UBS para cada 3000 habitantes
+        var pontuacao = (bairro.Pontuacoes.Saude / unidadesSaudeIdeais) * 100;
+
+        return Math.Min(pontuacao, 100);
+    }
+
+    private double CalcularPontuacaoEducacao(Bairro bairro)
+    {
+        if (bairro.Pontuacoes.Educacao == 0)
+        {
+            return 0; // Sem infraestrutura educacional
+        }
+
+        var populacao = bairro.Pontuacoes.DensidadePopulacional * bairro.AreaEmKm2;
+        var escolasIdeais = populacao / 500; // 1 escola para cada 500 alunos
+        var pontuacao = (bairro.Pontuacoes.Educacao / escolasIdeais) * 100;
+
+        return Math.Min(pontuacao, 100);
+    }
+
+    private double CalcularPontuacaoAreaVerde(Bairro bairro)
+    {
+        if (bairro.Pontuacoes.AreaVerde == 0)
         {
             return 0; // Sem área verde
         }
 
-        var ideal = 5 * bairroComPontuacoesBrutas.AreaEmKm2;
+        var ideal = 5 * bairro.AreaEmKm2;
+        var pontuacao = (bairro.Pontuacoes.AreaVerde / ideal) * 100;
 
-        // Calcula a pontuação proporcional à área verde ideal
-        var pontuacao = (bairroComPontuacoesBrutas.Pontuacoes.AreaVerde / ideal) * 100;
-
-        return pontuacao;
+        return Math.Min(pontuacao, 100);
     }
 
-    /// <summary>
-    /// Calcula a pontuação relacionada à infraestrutura de serviços para um bairro.
-    /// </summary>
-    private double CalcularPontuacaoEstruturaDeServicos(Bairro bairroComPontuacoesBrutas)
+    private double CalcularPontuacaoDensidadePopulacional(Bairro bairro)
     {
-        if (bairroComPontuacoesBrutas.Pontuacoes.EstruturaDeServicos == 0)
+        if (bairro.Pontuacoes.DensidadePopulacional == 0)
         {
-            return 0; // Sem estrutura de serviços
+            return 0; // Sem densidade registrada
         }
 
-        var ideal = 10 * bairroComPontuacoesBrutas.AreaEmKm2;
+        var ideal = 15000 * bairro.AreaEmKm2;
+        var pontuacao = (bairro.Pontuacoes.DensidadePopulacional / ideal) * 100;
 
-        // Calcula a pontuação proporcional à infraestrutura ideal
-        var pontuacao = (bairroComPontuacoesBrutas.Pontuacoes.EstruturaDeServicos / ideal) * 100;
-
-        return pontuacao;
+        return Math.Min(pontuacao, 100);
     }
 
-    /// <summary>
-    /// Busca o bairro mais próximo com base no nome fornecido usando fuzzy matching.
-    /// </summary>
     private async Task<Bairro> ObterBairroComNomeParecido(string nomeBairroApi)
     {
-        // Obtém todos os nomes dos bairros do banco
-        var bairros = await _dbContext.Bairros
-            .Select(b => b.Nome)
-            .ToListAsync();
-
-        // Realiza fuzzy matching para encontrar o bairro mais semelhante
-        var melhorMatch = bairros
-            .Select(nome => new
-            {
-                Nome = nome,
-                Similaridade = Fuzz.Ratio(nomeBairroApi, nome)
-            })
-            .OrderByDescending(result => result.Similaridade)
-            .FirstOrDefault();
+        var bairros = await _dbContext.Bairros.Select(b => b.Nome).ToListAsync();
+        var melhorMatch = bairros.Select(nome => new
+        {
+            Nome = nome,
+            Similaridade = Fuzz.Ratio(nomeBairroApi, nome)
+        })
+        .OrderByDescending(result => result.Similaridade)
+        .FirstOrDefault();
 
         var nome = melhorMatch?.Similaridade >= 70 ? melhorMatch.Nome : null;
 
         if (string.IsNullOrEmpty(nome))
         {
-            return null; // Nenhum bairro encontrado com similaridade suficiente
+            return null;
         }
 
-        // Retorna o bairro correspondente, incluindo as pontuações associadas
-        var bairro = await _dbContext.Bairros
+        return await _dbContext.Bairros
             .Include(b => b.Pontuacoes)
             .FirstOrDefaultAsync(b => b.Nome == nome);
-
-        return bairro;
     }
 }

@@ -18,9 +18,10 @@ namespace EcoSync.Models.DTO
         public double Longitude { get; set; }
         public double PontuacaoDensidadePopulacional { get; set; }
         public double PontuacaoAreaVerde { get; set; }
-        public double PontuacaoEstruturaDeServicos { get; set; }
+        public double PontuacaoEducacao { get; set; }
+        public double PontuacaoSaude { get; set; }
         
-        public double PontuacaoPoluicaoSonora { get; set; }
+        //public double PontuacaoPoluicaoSonora { get; set; }
         public double PontuacaoTotal { get; set; }
     }
 }

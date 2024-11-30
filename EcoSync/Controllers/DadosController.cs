@@ -32,4 +32,22 @@ public class DadosController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter dados do bairro");
         }
     }
+    
+    [HttpGet]
+    public async Task<ActionResult<RetornoMediaPontuacoesGerais>> ObterMediaPontuacoesGerais()
+    {
+        try
+        {
+            var resposta = await _dadosService.ObterMediaPontuacoesGerais();
+            return Ok(resposta);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao obter dados de medias gerais");
+        }
+    }
 }

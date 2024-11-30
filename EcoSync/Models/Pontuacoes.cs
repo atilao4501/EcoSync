@@ -20,7 +20,9 @@ namespace EcoSync.Models
         /// <summary>
         /// Pontuação da estrutura de serviços disponíveis.
         /// </summary>
-        public double EstruturaDeServicos { get; set; } = 0.0;
+        public double Educacao { get; set; } = 0.0;
+        
+        public double Saude { get; set; } = 0.0;
 
         public double DensidadePopulacional { get; set; } = 0.0;
     }

@@ -62,10 +62,13 @@ namespace EcoSync.Migrations
                     b.Property<double>("DensidadePopulacional")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("EstruturaDeServicos")
+                    b.Property<double>("Educacao")
                         .HasColumnType("double precision");
 
                     b.Property<double>("PoluicaoSonoraEArTransito")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Saude")
                         .HasColumnType("double precision");
 
                     b.HasKey("id");
