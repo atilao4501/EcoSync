@@ -1,0 +1,12 @@
+Área para a analise:
+	1.	Área Verde: Até 500 metros.
+	•	Impacto ambiental e psicológico direto está relacionado a áreas verdes próximas das residências.
+	2.	Infraestrutura de Serviços: Até 1 km.
+	•	Serviços como escolas, hospitais e transporte público geralmente são acessados em um raio de até 1 km, especialmente em áreas urbanas.
+	3.	Poluição Sonora e do Ar: Até 1 km.
+	•	Poluição de fontes fixas (indústrias) e móveis (avenidas principais) afeta a qualidade de vida em áreas ao redor de até 1 km.
+	4.	Densidade Populacional: Utilizar o limite geográfico do bairro.
+	•	Esta métrica é calculada por km², então não precisa de um raio; é avaliada para o bairro como um todo.
+
+
+    

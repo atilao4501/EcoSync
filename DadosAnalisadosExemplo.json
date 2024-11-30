@@ -1,0 +1,13 @@
+[
+  {
+    "nome": "Setor Oeste",
+    "latitude": -16.6809,
+    "longitude": -49.2535,
+    "pontuacoes": {
+      "areaVerde": <QuantidadeDeAreaVerde>,
+      "poluicaoSonoraEArTransito": <QuantidadeDePoluidores>,
+      "estruturaDeServicos": <QuantidadeDeEstruturaDeServicos>
+    },
+    "densidadePopulacional": <densidadePopulacional>
+  }
+]
