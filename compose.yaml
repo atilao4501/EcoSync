@@ -1,0 +1,26 @@
+﻿version: '3.8'
+services:
+  ecosync:
+    image: ecosync
+    build:
+      context: .
+      dockerfile: EcoSync/Dockerfile
+    depends_on:
+      - postgres-ecosync
+    networks:
+      - ecosync-network
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+  postgres-ecosync:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: Root@123
+    ports:
+      - "5432:5432"
+    networks:
+      - ecosync-network
+
+networks:
+  ecosync-network:
+    driver: bridge

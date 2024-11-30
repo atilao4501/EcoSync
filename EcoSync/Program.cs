@@ -30,6 +30,8 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<DbContextClass>();
     dbContext.Database.Migrate();
+    var seedScript = File.ReadAllText("Data/Seed/seed.sql");  // Caminho para o seu arquivo SQL
+    dbContext.Database.ExecuteSqlRaw(seedScript);
 }
 
 app.MapControllers();
