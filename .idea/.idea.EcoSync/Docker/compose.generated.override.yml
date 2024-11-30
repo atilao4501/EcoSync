@@ -25,14 +25,14 @@ services:
       RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "ecosync:dev"
     ports:
-    - "127.0.0.1:57002:57000"
-    - "127.0.0.1:57202:57200"
-    - "127.0.0.1:57402:57400"
+    - "127.0.0.1:57007:57000"
+    - "127.0.0.1:57207:57200"
+    - "127.0.0.1:57407:57400"
     volumes:
     - "/Users/atilaalcantara/Documents/ProjetosPessoais/EcoSync/EcoSync:/app:rw"
     - "/Users/atilaalcantara/Documents/ProjetosPessoais/EcoSync:/src:rw"
     - "/Users/atilaalcantara/.nuget/packages:/home/app/.nuget/packages"
     - "/Users/atilaalcantara/.local/share/JetBrains/RiderRemoteDebugger/2024.3/LinuxArm64:/opt/JetBrains/RiderDebuggerTools"
     - "/Users/atilaalcantara/Applications/Rider.app/Contents/bin/backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
-    - "/Users/atilaalcantara/Library/Logs/JetBrains/Rider2024.3/DebuggerWorker/JetBrains.Debugger.Worker.2024_11_30_14_32_49:/var/opt/JetBrains/RiderDebuggerTools:rw"
+    - "/Users/atilaalcantara/Library/Logs/JetBrains/Rider2024.3/DebuggerWorker/JetBrains.Debugger.Worker.2024_11_30_15_16_50:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"

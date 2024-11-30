@@ -17,6 +17,17 @@ builder.Services.AddScoped<IDadosService, DadosService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CORSPolicy",
+        builder => builder
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowAnyOrigin());  // Permitir qualquer origem sem credenciais
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,10 +42,20 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<DbContextClass>();
     dbContext.Database.Migrate();
     var seedScript = File.ReadAllText("Data/Seed/seed.sql");  // Caminho para o seu arquivo SQL
-    dbContext.Database.ExecuteSqlRaw(seedScript);
+
+    try
+    {
+        dbContext.Database.ExecuteSqlRaw(seedScript);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+    }
+    
 }
 
 app.MapControllers();
+app.UseCors("CORSPolicy");
 
 app.UseHttpsRedirection();
 
