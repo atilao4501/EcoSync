@@ -4,7 +4,8 @@ using EcoSync.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EcoSync.Controllers;
-
+[ApiController]
+[Route("[action]")]
 public class DadosController : ControllerBase
 {
     private readonly IDadosService _dadosService;

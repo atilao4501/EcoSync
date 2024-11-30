@@ -6,6 +6,16 @@ namespace EcoSync.Models.DTO
     public class RetornoPontuacoesPorBairro
     {
         public string NomeBairro { get; set; }
+        
+        /// <summary>
+        /// Latitude do bairro.
+        /// </summary>
+        public double Latitude { get; set; }
+
+        /// <summary>
+        /// Longitude do bairro.
+        /// </summary>
+        public double Longitude { get; set; }
         public double PontuacaoDensidadePopulacional { get; set; }
         public double PontuacaoAreaVerde { get; set; }
         public double PontuacaoEstruturaDeServicos { get; set; }

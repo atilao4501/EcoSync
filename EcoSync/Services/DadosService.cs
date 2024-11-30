@@ -33,11 +33,19 @@ public class DadosService : IDadosService
     public async Task<RetornoPontuacoesPorBairro> ObterPontuacoesPorCep(int cep)
     {
         string urlCep = "https://viacep.com.br/ws/" + cep + "/json/";
-        var dadosCep = await new HttpClient().GetStringAsync(urlCep);
+        var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync(urlCep);
 
-        if (!int.TryParse(dadosCep, out var statusCode) || statusCode != 200)
+        if (!response.IsSuccessStatusCode)
         {
-            throw new HttpRequestException($"Erro ao obter dados de CEP: {dadosCep}");
+            throw new HttpRequestException($"Erro ao obter dados de CEP: {response.StatusCode} - {response.ReasonPhrase}");
+        }
+
+        var dadosCep = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrEmpty(dadosCep))
+        {
+            throw new HttpRequestException("A resposta da API de CEP está vazia.");
         }
 
         var dadosCepDeserializado = JsonConvert.DeserializeObject<RetornoApiCep>(dadosCep);
@@ -76,6 +84,8 @@ public class DadosService : IDadosService
         var pontuacoesFinais = new RetornoPontuacoesPorBairro()
         {
             NomeBairro = bairro.Nome,
+            Latitude = bairro.Latitude,
+            Longitude = bairro.Longitude,
             PontuacaoAreaVerde = pontuacaoAreaVerde,
             PontuacaoDensidadePopulacional = pontuacaoDensidadePopulacional,
             PontuacaoEstruturaDeServicos = pontuacaoEstruturaDeServicos,
