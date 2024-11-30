@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EcoSync.Migrations
 {
     /// <inheritdoc />
-    public partial class initialmigration : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,8 @@ namespace EcoSync.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     AreaVerde = table.Column<double>(type: "double precision", nullable: false),
                     PoluicaoSonoraEArTransito = table.Column<double>(type: "double precision", nullable: false),
-                    EstruturaDeServicos = table.Column<double>(type: "double precision", nullable: false),
+                    Educacao = table.Column<double>(type: "double precision", nullable: false),
+                    Saude = table.Column<double>(type: "double precision", nullable: false),
                     DensidadePopulacional = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>

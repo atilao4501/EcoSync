@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EcoSync.Migrations
 {
     [DbContext(typeof(DbContextClass))]
-    [Migration("20241130070151_Long,Latadicionados")]
-    partial class LongLatadicionados
+    [Migration("20241130170318_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,10 +65,13 @@ namespace EcoSync.Migrations
                     b.Property<double>("DensidadePopulacional")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("EstruturaDeServicos")
+                    b.Property<double>("Educacao")
                         .HasColumnType("double precision");
 
                     b.Property<double>("PoluicaoSonoraEArTransito")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Saude")
                         .HasColumnType("double precision");
 
                     b.HasKey("id");

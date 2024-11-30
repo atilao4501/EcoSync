@@ -25,5 +25,6 @@ namespace EcoSync.Models
         public double Saude { get; set; } = 0.0;
 
         public double DensidadePopulacional { get; set; } = 0.0;
+        
     }
 }
