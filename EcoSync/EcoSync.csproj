@@ -29,13 +29,12 @@
             <Link>.dockerignore</Link>
         </Content>
     </ItemGroup>
-
-    <!-- Ajuste para copiar toda a pasta Data -->
-<!--    <ItemGroup>-->
-<!--        <Content Include="Data\**\*">-->
-<!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
-<!--        </Content>-->
-<!--    </ItemGroup>-->
+    
+    <ItemGroup>
+        <Content Include="Data\**\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
     <ItemGroup>
         <Folder Include="Migrations\" />

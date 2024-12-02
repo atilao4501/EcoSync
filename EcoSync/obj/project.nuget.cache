@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "yyEgvEa8kdk=",
+  "dgSpecHash": "WD0J01W1ovA=",
   "success": true,
-  "projectFilePath": "/Users/atilaalcantara/Documents/ProjetosPessoais/EcoSync/EcoSync/EcoSync.csproj",
+  "projectFilePath": "/Users/atilaalcantara/Documents/ProjetosPessoais/CampuPartyGO24/EcoSync/EcoSync/EcoSync.csproj",
   "expectedPackageFiles": [
     "/Users/atilaalcantara/.nuget/packages/fuzzysharp/2.0.2/fuzzysharp.2.0.2.nupkg.sha512",
     "/Users/atilaalcantara/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",

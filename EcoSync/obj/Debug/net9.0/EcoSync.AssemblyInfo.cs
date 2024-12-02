@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EcoSync")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+498a9ea1979d578c2981fafaf59be366779fcc20")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c27e995c7dea02367474180c3b7645f1601e29af")]
 [assembly: System.Reflection.AssemblyProductAttribute("EcoSync")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EcoSync")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

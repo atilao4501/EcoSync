@@ -3577,11 +3577,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/atilaalcantara/Documents/ProjetosPessoais/EcoSync/EcoSync/EcoSync.csproj",
+      "projectUniqueName": "/Users/atilaalcantara/Documents/ProjetosPessoais/CampuPartyGO24/EcoSync/EcoSync/EcoSync.csproj",
       "projectName": "EcoSync",
-      "projectPath": "/Users/atilaalcantara/Documents/ProjetosPessoais/EcoSync/EcoSync/EcoSync.csproj",
+      "projectPath": "/Users/atilaalcantara/Documents/ProjetosPessoais/CampuPartyGO24/EcoSync/EcoSync/EcoSync.csproj",
       "packagesPath": "/Users/atilaalcantara/.nuget/packages/",
-      "outputPath": "/Users/atilaalcantara/Documents/ProjetosPessoais/EcoSync/EcoSync/obj/",
+      "outputPath": "/Users/atilaalcantara/Documents/ProjetosPessoais/CampuPartyGO24/EcoSync/EcoSync/obj/",
       "projectStyle": "PackageReference",
       "UsingMicrosoftNETSdk": false,
       "configFilePaths": [
